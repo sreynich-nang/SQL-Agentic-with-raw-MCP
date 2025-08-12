@@ -58,7 +58,7 @@ pip install -r requirements.txt
 
 ### 2. PostgreSQL Database Setup
 
-#### Option A: Local PostgreSQL Installation
+#### Option in Local PostgreSQL Installation
 
 ```bash
 # Ubuntu/Debian
@@ -71,34 +71,6 @@ brew services start postgresql
 
 # Windows
 # Download and install from: https://www.postgresql.org/download/windows/
-```
-
-#### Option B: Docker PostgreSQL (Recommended for testing)
-
-```bash
-# Run PostgreSQL in Docker
-docker run --name ai-dashboard-postgres \
-  -e POSTGRES_DB=ai_dashboard_db \
-  -e POSTGRES_USER=dashboard_user \
-  -e POSTGRES_PASSWORD=your_password_here \
-  -p 5432:5432 \
-  -d postgres:15
-
-# Wait a few seconds for container to start
-docker ps
-```
-
-#### Create Database and User (if using local installation)
-
-```bash
-# Connect to PostgreSQL as superuser
-sudo -u postgres psql
-
-# Create database and user
-CREATE DATABASE ai_dashboard_db;
-CREATE USER dashboard_user WITH PASSWORD 'your_password_here';
-GRANT ALL PRIVILEGES ON DATABASE ai_dashboard_db TO dashboard_user;
-\q
 ```
 
 ### 3. Environment Configuration
@@ -122,8 +94,7 @@ DB_PASSWORD=your_password_here
 DB_NAME=ai_dashboard_db
 
 # LLM Configuration
-
-MODEL_ID=gemini-1.5-flash
+MODEL_ID=gemini-2.0-flash
 MODEL_API_KEY=api_key_here_from_gemini
 
 # MCP Server Configuration
@@ -147,7 +118,7 @@ This creates sample `customers` and `orders` tables with test data.
 2. Create a new API key
 3. Add to .env as `MODEL_API_KEY`
 
-## 🚀 Running the Application
+## 🚀 Running this Application
 
 ### Step 1: Start MCP Server
 
@@ -184,18 +155,7 @@ curl http://localhost:8000/health
 # Should return: {"status": "healthy"}
 ```
 
-### Test 2: Chat Agent (Command Line)
-
-```bash
-python -c "
-import asyncio
-from agents.chat_agent import run_agent
-result = asyncio.run(run_agent('How many customers do we have?'))
-print(result)
-"
-```
-
-### Test 3: Dashboard Generation
+### Test 2:  Dashboard Generation
 
 ```bash
 python -c "
@@ -225,55 +185,12 @@ print('Dashboard generated successfully!' if '<html>' in html else 'Error')
 
 ### Common Issues
 
-#### 1. "Connection refused" to database
 ```bash
-# Check if PostgreSQL is running
-sudo systemctl status postgresql  # Linux
-brew services list | grep postgres  # macOS
-docker ps  # Docker
-
-# Test connection manually
-psql -h localhost -p 5432 -U dashboard_user -d ai_dashboard_db
+If you have issue, i recommend to understand the root cause of the error in yr terminal, then go to any AI asking for clarification to take action on that error. 
+Muy muy! 
+:D
+Good Luck!
 ```
-
-#### 2. "MCP tool call failed"
-```bash
-# Ensure MCP server is running
-python -m mcp_server.sql_read_only
-
-# Check if port 8000 is available
-netstat -an | grep 8000
-```
-
-#### 3. "No module named 'agents'"
-```bash
-# Ensure you're in the correct directory
-pwd  # Should end with /ai_sql_dashboard
-
-# Check Python path
-python -c "import sys; print(sys.path)"
-```
-
-#### 4. API Key Issues
-```bash
-# Verify .env file is loaded
-python -c "
-from dotenv import load_dotenv
-import os
-load_dotenv()
-print('API Key:', os.getenv('MODEL_API_KEY')[:10] + '...' if os.getenv('MODEL_API_KEY') else 'Not found')
-"
-```
-
-#### 5. Streamlit Issues
-```bash
-# Clear Streamlit cache
-streamlit cache clear
-
-# Run with debug mode
-streamlit run app.py --logger.level=debug
-```
-
 ## 🔒 Security Features
 
 - **Read-Only Database Access**: Only SELECT queries allowed
@@ -300,43 +217,10 @@ streamlit run app.py --logger.level=debug
 - Connection pooling for performance
 - Schema introspection for AI context
 
-## 📊 Sample Queries Generated
-
-The system can handle complex queries like:
-
-```sql
--- Customer analysis
-SELECT c.city, COUNT(*) as customer_count, 
-       AVG(o.price * o.quantity) as avg_order_value
-FROM customers c 
-JOIN orders o ON c.id = o.customer_id 
-GROUP BY c.city 
-ORDER BY avg_order_value DESC;
-
--- Revenue trends
-SELECT DATE_TRUNC('month', order_date) as month,
-       SUM(price * quantity) as monthly_revenue,
-       COUNT(*) as order_count
-FROM orders 
-GROUP BY month 
-ORDER BY month;
-```
-
-## 🎨 Customization
-
 ### Adding New Database Tables
 1. Add tables to your PostgreSQL database
 2. The schema will be auto-detected
 3. AI will automatically include new tables in analysis
-
-### Custom Dashboard Templates
-Modify `agents/dashboard_agent.py`:
-```python
-# Add custom chart types
-def generate_custom_chart(self, data):
-    # Your custom visualization logic
-    pass
-```
 
 ### Different LLM Models
 Update `.env` file:
@@ -396,30 +280,6 @@ logging.basicConfig(level=logging.DEBUG)
 ## 📄 License
 
 MIT License - see LICENSE file for details.
-
-## 🆘 Support
-
-### Get Help
-- Check troubleshooting section above
-- Review logs in terminal output
-- Test each component individually
-
-### Common Support Questions
-
-**Q: Can I use with MySQL instead of PostgreSQL?**
-A: Yes, modify `mcp_server/tools.py` to use `aiomysql` instead of `asyncpg`
-
-**Q: How do I add more sample data?**
-A: Modify `setup_db.py` and run it again
-
-**Q: Can I deploy this to production?**
-A: Yes, but add proper authentication, rate limiting, and security headers
-
-**Q: How do I backup my data?**
-A: Use `pg_dump` for PostgreSQL backups:
-```bash
-pg_dump -h localhost -U dashboard_user ai_dashboard_db > backup.sql
-```
 
 ---
 
