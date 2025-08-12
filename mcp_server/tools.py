@@ -1,4 +1,4 @@
-"""Database tool handlers for MCP server"""
+"""Database tool handlers for MCP server - FIXED VERSION"""
 
 import asyncio
 import asyncpg
@@ -129,26 +129,35 @@ class DatabaseTools:
         Returns:
             True if query is safe, False otherwise
         """
+        print(f"=== VALIDATING QUERY ===")
+        print(f"Original query: '{query}'")
+        
         # Remove comments and normalize whitespace
         query_clean = re.sub(r'--.*$', '', query, flags=re.MULTILINE)
         query_clean = re.sub(r'/\*.*?\*/', '', query_clean, flags=re.DOTALL)
         query_clean = ' '.join(query_clean.split()).strip().lower()
         
+        print(f"Cleaned query: '{query_clean}'")
+        
         # Must start with SELECT
         if not query_clean.startswith('select'):
+            print("VALIDATION FAILED: Does not start with 'select'")
             return False
         
-        # Forbidden keywords
-        forbidden = [
-            'insert', 'update', 'delete', 'drop', 'create', 'alter',
-            'truncate', 'replace', 'merge', 'grant', 'revoke',
-            'exec', 'execute', 'call', 'declare'
+        # FIXED: Use word boundaries to match whole words only
+        forbidden_patterns = [
+            r'\binsert\b', r'\bupdate\b', r'\bdelete\b', r'\bdrop\b', 
+            r'\bcreate\b', r'\balter\b', r'\btruncate\b', r'\breplace\b', 
+            r'\bmerge\b', r'\bgrant\b', r'\brevoke\b', r'\bexec\b', 
+            r'\bexecute\b', r'\bcall\b', r'\bdeclare\b'
         ]
         
-        for keyword in forbidden:
-            if keyword in query_clean:
+        for pattern in forbidden_patterns:
+            if re.search(pattern, query_clean):
+                print(f"VALIDATION FAILED: Found forbidden pattern: {pattern}")
                 return False
         
+        print("VALIDATION PASSED")
         return True
     
     async def execute_query(self, query: str) -> Dict[str, Any]:
@@ -196,4 +205,3 @@ class DatabaseTools:
         except Exception as e:
             print(f"Error executing query: {e}")
             raise
-
