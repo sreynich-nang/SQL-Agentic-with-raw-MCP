@@ -1,4 +1,4 @@
-# AI SQL Dashboard Agent
+# AI SQL Dashboard Agent with Streamlit by MCP built-in Local Server
 
 A complete AI-powered SQL dashboard system that converts natural language questions into SQL queries and generates interactive dashboards. Built with Streamlit, PostgreSQL, and MCP (Model Context Protocol).
 
