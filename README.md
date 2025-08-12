@@ -3,7 +3,16 @@
 A complete AI-powered SQL dashboard system that converts natural language questions into SQL queries and generates interactive dashboards. Built with Streamlit, PostgreSQL, and MCP (Model Context Protocol).
 
 ## Video Demonstration
-[Watch the Video](https://)
+[Watch the Video](https://youtu.be/sioxAVhg-VY)
+
+## Sample Testing
+<p align="center">
+  <img src="images/chat1.jpg" alt="Chat 1" width="200">
+  <img src="images/chat2.jpg" alt="Chat 2" width="200">
+  <img src="images/chat3.jpg" alt="Chat 3" width="200">
+  <img src="images/posgre_script1.jpg" alt="Chat 4" width="200">
+  <img src="images/dashboard1.jpg" alt="Chat 4" width="200">
+</p>
 
 ## 🚀 Features
 
